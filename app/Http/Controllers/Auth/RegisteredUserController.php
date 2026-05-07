@@ -20,7 +20,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.register'); //muestra el formulario
     }
 
     /**
@@ -34,15 +34,17 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'rol' => ['required', 'numeric', 'between:1,2'] // se requiere que el select sea de valor numerico entre 1 y 2
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'rol' => $request->rol
         ]);
 
-        event(new Registered($user));
+        event(new Registered($user)); // activa el email de verificacion. Ese evento es el que dispara el envío del correo con el link de verificación. 
 
         Auth::login($user);
 
